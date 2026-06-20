@@ -59,7 +59,7 @@ def update_author(session: Session, data: UpdateAuthorSchema, author_id: int):
 
 def author_detail(session: Session, author_id: int):
     author = get_object(session, author_id, Author)
-    return response_model('Author', status.HTTP_200_OK, {'author': {author}, 'books': author.books})
+    return response_model('Author', status.HTTP_200_OK, {'author': author, 'books': author.books})
 
 
 def author_list(session: Session):
@@ -99,7 +99,7 @@ def update_category(session: Session, data: UpdateCategorySchema, category_id: i
 
 def category_detail(session: Session, category_id: int):
     category = get_object(session, category_id, Category)
-    return response_model('category', status.HTTP_200_OK, {'category': {category}, 'books': category.books})
+    return response_model('category', status.HTTP_200_OK, {'category': category, 'books': category.books})
 
 def category_delete(session: Session, category_id:int):
     category = get_object(session, category_id, Category)

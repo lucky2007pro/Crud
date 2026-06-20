@@ -2,13 +2,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from fastapi_jwt_auth2 import AuthJWT
 from db import get_db
-from user.schema import SignUpSchema, LoginSchema
-from user.auth import register, login, profile
+from user.schema import SignUpSchema, LoginSchema, ProfileUpdateSchema, PasswordChangeSchema
+from user.auth import register, login, profile, profile_update, password_change, token_refresh, logout
 
-router = APIRouter(
-    prefix="/user",
-    tags=["user"]
-)
+router = APIRouter(prefix="/user", tags=["user"])
 
 @router.post("/register")
 def register_user(user_data: SignUpSchema, db: Session = Depends(get_db)):
@@ -21,3 +18,19 @@ def login_user(user_data: LoginSchema, db: Session = Depends(get_db), Authorize:
 @router.get("/profile")
 def get_user_profile(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     return profile(db, Authorize)
+
+@router.put("/profile_update")
+def update_user_profile(user_data: ProfileUpdateSchema, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    return profile_update(user_data, db, Authorize)
+
+@router.put("/password_change")
+def change_user_password(user_data: PasswordChangeSchema, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    return password_change(user_data, db, Authorize)
+
+@router.post("/refresh")
+def refresh_token(Authorize: AuthJWT = Depends()):
+    return token_refresh(Authorize)
+
+@router.post("/logout")
+def logout_user(Authorize: AuthJWT = Depends()):
+    return logout(Authorize)

@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship
 from db import Base
+
 
 class User(Base):
     __tablename__ = 'users'
@@ -13,3 +14,12 @@ class User(Base):
     phone_number = Column(String(20), unique=True, nullable=False)
     password = Column(String(128), nullable=False)
 
+class BlackListToken(Base):
+    __tablename__ = 'blacklist_tokens'
+
+    id = Column(Integer, primary_key=True)
+    token = Column(String(500), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    user = relationship('User', backref='blacklist_tokens')
+    jti = Column(String(36), unique=True, nullable=False)
+    created_at = Column(DateTime, default=func.now())
