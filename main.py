@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from book.router import router as book_router
 from user.router import router as user_router
 from user.schema import Settings
 from fastapi_jwt_auth2 import AuthJWT
-
+from service import check_token
 
 app = FastAPI(title='Book Project', description='Kitoblar olami', version='1.0.0')
 

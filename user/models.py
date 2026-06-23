@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, func, Boolean
 from sqlalchemy.orm import relationship
 from db import Base
 
@@ -13,6 +13,7 @@ class User(Base):
     email = Column(String(120), unique=True, nullable=False)
     phone_number = Column(String(20), unique=True, nullable=False)
     password = Column(String(128), nullable=False)
+    is_staff = Column(Boolean, default=False)
 
 class BlackListToken(Base):
     __tablename__ = 'blacklist_tokens'

@@ -1,6 +1,5 @@
 import re
-
-from user.models import User
+from user.models import User, BlacklistToken
 from user.schema import SignUpSchema, LoginSchema, ProfileUpdateSchema, PasswordChangeSchema
 from sqlalchemy.orm import Session
 from db import SessionLocal
@@ -112,6 +111,7 @@ def profile(db: Session, Authorize: AuthJWT):
                 'username': user.username,
                 'email': user.email,
                 'phone_number': user.phone_number,
+                'is_staff': user.is_staff,
             }
         }
     except Exception as e:
@@ -158,6 +158,7 @@ def profile_update(data: ProfileUpdateSchema, db: Session, Authorize: AuthJWT):
                 'username': user.username,
                 'email': user.email,
                 'phone_number': user.phone_number,
+                'is_staff': user.is_staff,
             }
         }
     except Exception as e:
@@ -256,3 +257,10 @@ def logout(Authorize: AuthJWT):
             },
             status_code=status.HTTP_401_UNAUTHORIZED
         )
+    token = BlacklistToken(jti=jti)
+    db.add(token)
+    db.commit()
+    return {
+        'message': 'User logged out successfully',
+        'status': status.HTTP_200_OK,
+    }

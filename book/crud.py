@@ -194,6 +194,29 @@ def book_list(session: Session):
     books = session.query(Book).options(joinedload(Book.author)).order_by(Book.id.desc()).all()
     return response_model('book', status.HTTP_200_OK, books)
 
+def filter_book(session: Session, title: str = None, desc: str = None):
+    query = session.query(Book).options(joinedload(Book.author), joinedload(Book.category))
+    if title:
+        query = query.filter(Book.title.ilike(f"%{title}%"))
+    if desc:
+        query = query.filter(Book.desc.ilike(f"%{desc}%"))
+    books = query.order_by(Book.id.desc()).all()
+    return response_model('Filtered books', status.HTTP_200_OK, books)
+
+def search_book(session: Session, query_str: str = None):
+    from sqlalchemy import or_
+    query = session.query(Book).options(joinedload(Book.author), joinedload(Book.category))
+    if query_str:
+        query = query.filter(
+            or_(
+                Book.title.ilike(f"%{query_str}%"),
+                Book.desc.ilike(f"%{query_str}%")
+            )
+        )
+    books = query.order_by(Book.id.desc()).all()
+    return response_model('Search results', status.HTTP_200_OK, books)
+
+
 
 #COMMENT
 

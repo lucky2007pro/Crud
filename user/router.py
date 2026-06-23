@@ -4,6 +4,7 @@ from fastapi_jwt_auth2 import AuthJWT
 from db import get_db
 from user.schema import SignUpSchema, LoginSchema, ProfileUpdateSchema, PasswordChangeSchema
 from user.auth import register, login, profile, profile_update, password_change, token_refresh, logout
+from service import check_token
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -15,15 +16,15 @@ def register_user(user_data: SignUpSchema, db: Session = Depends(get_db)):
 def login_user(user_data: LoginSchema, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     return login(user_data, db, Authorize)
 
-@router.get("/profile")
+@router.get("/profile", dependencies=[Depends(check_token)])
 def get_user_profile(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     return profile(db, Authorize)
 
-@router.put("/profile_update")
+@router.put("/profile_update", dependencies=[Depends(check_token)])
 def update_user_profile(user_data: ProfileUpdateSchema, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     return profile_update(user_data, db, Authorize)
 
-@router.put("/password_change")
+@router.put("/password_change", dependencies=[Depends(check_token)])
 def change_user_password(user_data: PasswordChangeSchema, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
     return password_change(user_data, db, Authorize)
 
@@ -31,6 +32,6 @@ def change_user_password(user_data: PasswordChangeSchema, db: Session = Depends(
 def refresh_token(Authorize: AuthJWT = Depends()):
     return token_refresh(Authorize)
 
-@router.post("/logout")
+@router.post("/logout", dependencies=[Depends(check_token)])
 def logout_user(Authorize: AuthJWT = Depends()):
     return logout(Authorize)

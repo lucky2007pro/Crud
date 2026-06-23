@@ -3,12 +3,14 @@ from db import get_db
 import book.crud as crud
 import book.schema as schema
 from sqlalchemy.orm import Session
+from service import check_token
+from user.permission import check_admin
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(check_token)])
 
 
-@router.post('/create-author')
+@router.post('/create-author', dependencies=[Depends(check_admin)])
 def create_author_router(data:schema.CreateAuthorSchema , session: Session = Depends(get_db)):
     return crud.create_author(session, data)
 
@@ -20,17 +22,17 @@ def detail_author_router(author_id:int, session: Session = Depends(get_db)):
 def list_author_router(session: Session = Depends(get_db)):
     return crud.author_list(session)
 
-@router.patch('/update-author/{author_id}')
+@router.patch('/update-author/{author_id}', dependencies=[Depends(check_admin)])
 def update_author_router(author_id:int, data: schema.UpdateAuthorSchema ,session: Session = Depends(get_db)):
     return crud.update_author(session, data, author_id)
 
-@router.delete('/delete-author/{author_id}')
+@router.delete('/delete-author/{author_id}', dependencies=[Depends(check_admin)])
 def delete_author_router(author_id:int, session: Session = Depends(get_db)):
     return crud.author_delete(session, author_id)
 
 
 #CATEGORY
-@router.post('/create-category')
+@router.post('/create-category', dependencies=[Depends(check_admin)])
 def create_category_router(data:schema.CreateCategorySchema , session: Session = Depends(get_db)):
     return crud.create_category(session, data)
 
@@ -42,16 +44,17 @@ def detail_category_router(category_id:int, session: Session = Depends(get_db)):
 def list_category_router(session: Session = Depends(get_db)):
     return crud.category_list(session)
 
-@router.patch('/update-category/{category_id}')
+@router.patch('/update-category/{category_id}', dependencies=[Depends(check_admin)])
 def update_category_router(category_id:int, data: schema.UpdateCategorySchema ,session: Session = Depends(get_db)):
     return crud.update_category(session, data, category_id)
 
-@router.delete('/delete-category/{category_id}')
+@router.delete('/delete-category/{category_id}', dependencies=[Depends(check_admin)])
 def delete_category_router(category_id:int, session: Session = Depends(get_db)):
     return crud.category_delete(session, category_id)
 
+
 #BOOK
-@router.post('/create-book')
+@router.post('/create-book', dependencies=[Depends(check_admin)])
 def create_book_router(data:schema.CreateBookSchema , session: Session = Depends(get_db)):
     return crud.create_book(session, data)
 
@@ -63,13 +66,22 @@ def detail_book_router(book_id:int, session: Session = Depends(get_db)):
 def list_book_router(session: Session = Depends(get_db)):
     return crud.book_list(session)
 
-@router.patch('/update-book/{book_id}')
+@router.get('/filter-book/')
+def filter_book_router(title: str = None, desc: str = None, session: Session = Depends(get_db)):
+    return crud.filter_book(session, title, desc)
+
+@router.get('/search-book/')
+def search_book_router(query_str: str = None, session: Session = Depends(get_db)):
+    return crud.search_book(session, query_str)
+
+@router.patch('/update-book/{book_id}', dependencies=[Depends(check_admin)])
 def update_book_router(book_id:int, data: schema.UpdateBookSchema ,session: Session = Depends(get_db)):
     return crud.update_book(session, data, book_id)
 
-@router.delete('/delete-book/{book_id}')
+@router.delete('/delete-book/{book_id}', dependencies=[Depends(check_admin)])
 def delete_book_router(book_id:int, session: Session = Depends(get_db)):
     return crud.book_delete(session, book_id)
+
 
 #COMMENT
 @router.post('/create-comment')
@@ -91,6 +103,7 @@ def update_comment_router(comment_id:int, data: schema.UpdateCommentSchema ,sess
 @router.delete('/delete-comment/{comment_id}')
 def delete_comment_router(comment_id:int, session: Session = Depends(get_db)):
     return crud.comment_delete(session, comment_id)
+
 
 #SAVED
 @router.post('/create-saved')
