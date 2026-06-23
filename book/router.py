@@ -4,7 +4,7 @@ import book.crud as crud
 import book.schema as schema
 from sqlalchemy.orm import Session
 from service import check_token
-from user.permission import check_admin
+from permission import check_admin
 
 
 router = APIRouter(dependencies=[Depends(check_token)])

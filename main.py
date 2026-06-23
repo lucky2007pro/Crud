@@ -13,3 +13,18 @@ app.include_router(user_router, prefix='/auth', tags=['auth'])
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
+@AuthJWT.token_in_denylist_loader
+def check_if_token_in_denylist(decrypted_token: dict, request: Request):
+    token_type = decrypted_token['type']
+    if token_type != 'access':
+        return False
+    jti = decrypted_token['jti']
+    db = SessionLocal()
+    try:
+        token = db.query(BlacklistToken).filter(BlacklistToken.jti == jti).first()
+        if token:
+            return True
+        return False
+    finally:
+        db.close()
