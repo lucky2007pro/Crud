@@ -5,7 +5,7 @@ from db import get_db
 from user.schema import SignUpSchema, LoginSchema, ProfileUpdateSchema, PasswordChangeSchema
 from user.auth import register, login, profile, profile_update, password_change, token_refresh, logout
 from service import check_token
-from permission import check_admin
+from permission import is_admin
 
 
 router = APIRouter(prefix="/user", tags=["user"])
