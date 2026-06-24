@@ -8,6 +8,7 @@ class SignUpSchema(BaseModel):
     username: str = Field(max_length=50)
     email: EmailStr
     phone_number: str = Field(max_length=20)
+    address: str = Field(max_length=128)
     password: str = Field(min_length=8)
     conf_password: str = Field(min_length=8)
 
@@ -20,6 +21,7 @@ class SignUpSchema(BaseModel):
                 'username': 'johndoe',
                 'email': 'usa20070302@gmail.com',
                 'phone_number': '+998901234567',
+                'address': 'Toshkent shahar, Chilonzor tumani',
                 'password': 'password123',
                 'conf_password': 'password123'
             }
@@ -39,6 +41,7 @@ class ProfileUpdateSchema(BaseModel):
     username: str
     email: Optional[EmailStr]
     phone_number: Optional[str] = Field(max_length=20)
+    address: Optional[str] = Field(max_length=128)
 
     model_config = {
         'from_attribute': True,
@@ -48,7 +51,8 @@ class ProfileUpdateSchema(BaseModel):
                 'last_name': 'Doe',
                 'username': 'johndoe',
                 'email': 'usa20070302@gmail.com',
-                'phone_number': '+998901234567'
+                'phone_number': '+998901234567',
+                'address': 'Toshkent shahar, Yunusobod tumani'
             }
         }
     }

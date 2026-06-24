@@ -2,6 +2,7 @@ from db import Base
 from sqlalchemy import Column, String, Integer, Numeric, Text, Boolean, \
     ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
+from user.models import User
 
 
 class Author(Base):
@@ -70,4 +71,32 @@ class Saved(Base):
     book = relationship('Book')
     
     
-        
+class Cart(Base):
+    __tablename__ = 'carts'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'))
+    quantity = Column(Integer, default=1)
+    created_at = Column(DateTime, default=func.now())
+    total_price = Column(Numeric(12, 2))
+
+    
+    user = relationship('User')
+    book = relationship('Book')
+
+
+
+class Order(Base):
+    __tablename__ = 'orders'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'))
+    quantity = Column(Integer, default=1)
+    created_at = Column(DateTime, default=func.now())
+    total_price = Column(Numeric(12, 2))
+
+    
+    user = relationship('User')
+    book = relationship('Book')

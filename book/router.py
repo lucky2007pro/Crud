@@ -4,7 +4,8 @@ import book.crud as crud
 import book.schema as schema
 from sqlalchemy.orm import Session
 from service import check_token
-from permission import is_admin, is_owner, is_owner_or_readonly, is_owner_or_admin
+from permission import is_admin, is_owner, is_owner_or_readonly, is_owner_or_admin, get_current_user
+from user.models import User
 
 
 router = APIRouter(dependencies=[Depends(check_token)])
@@ -125,3 +126,29 @@ def update_saved_router(saved_id:int, data: schema.UpdateSavedSchema ,session: S
 @router.delete('/delete-saved/{saved_id}', dependencies=[Depends(is_owner_or_admin)])
 def delete_saved_router(saved_id:int, session: Session = Depends(get_db)):
     return crud.saved_delete(session, saved_id)
+
+
+#CART AND ORDER
+@router.post('/create-cart')
+def create_cart_router(data: schema.CreateCartSchema, session: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return crud.create_cart(session, data, current_user.id)
+
+@router.patch('/update-cart/{cart_id}', dependencies=[Depends(is_owner)])
+def update_cart_router(cart_id: int, data: schema.UpdateCartSchema, session: Session = Depends(get_db)):
+    return crud.update_cart(session, data, cart_id)
+
+@router.delete('/delete-cart/{cart_id}', dependencies=[Depends(is_owner)])
+def delete_cart_router(cart_id: int, session: Session = Depends(get_db)):
+    return crud.delete_cart(session, cart_id)
+
+@router.get('/my-cart/')
+def list_cart_router(session: Session = Depends(get_db), current_user: User = Depends(get_current_user), limit: int = 10, offset: int = 0):
+    return crud.cart_list(session, current_user, limit, offset)
+
+@router.post('/checkout/')
+def checkout_router(session: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return crud.checkout(session, current_user)
+
+@router.get('/my-orders/')
+def list_orders_router(session: Session = Depends(get_db), current_user: User = Depends(get_current_user), limit: int = 10, offset: int = 0):
+    return crud.order_list(session, current_user, limit, offset)

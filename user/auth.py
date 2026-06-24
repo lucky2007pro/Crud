@@ -51,6 +51,7 @@ def register(user_data: SignUpSchema, session: Session):
         username=user_data.username,
         email=user_data.email,
         phone_number=user_data.phone_number,
+        address=user_data.address,
         password=generate_password_hash(user_data.password)
     )
     session.add(user)
@@ -111,6 +112,7 @@ def profile(db: Session, Authorize: AuthJWT):
                 'username': user.username,
                 'email': user.email,
                 'phone_number': user.phone_number,
+                'address': user.address,
                 'is_staff': user.is_staff,
             }
         }
@@ -145,6 +147,7 @@ def profile_update(data: ProfileUpdateSchema, db: Session, Authorize: AuthJWT):
         user.last_name = data.last_name or user.last_name
         user.email = data.email or user.email
         user.phone_number = data.phone_number or user.phone_number
+        user.address = data.address or user.address
 
         db.commit()
         db.refresh(user)
@@ -158,6 +161,7 @@ def profile_update(data: ProfileUpdateSchema, db: Session, Authorize: AuthJWT):
                 'username': user.username,
                 'email': user.email,
                 'phone_number': user.phone_number,
+                'address': user.address,
                 'is_staff': user.is_staff,
             }
         }

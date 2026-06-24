@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi_jwt_auth2 import AuthJWT
 from db import get_db
 from user.models import User
-from book.models import Comment, Saved
+from book.models import Comment, Saved, Cart, Order
 
 def get_current_user(Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
     try:
@@ -37,6 +37,9 @@ def is_owner(request: Request, user: User = Depends(get_current_user), db: Sessi
     comment_id = request.path_params.get('comment_id')
     saved_id = request.path_params.get('saved_id')
 
+    cart_id = request.path_params.get('cart_id')
+    order_id = request.path_params.get('order_id')
+
     if comment_id:
         comment = db.query(Comment).filter(Comment.id == int(comment_id)).first()
         if comment and comment.user != user.username:
@@ -47,6 +50,20 @@ def is_owner(request: Request, user: User = Depends(get_current_user), db: Sessi
     elif saved_id:
         saved = db.query(Saved).filter(Saved.id == int(saved_id)).first()
         if saved and saved.user != user.username:
+            raise HTTPException(
+                detail={'message': "Siz bu obyektning egasi emassiz"},
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+    elif cart_id:
+        cart = db.query(Cart).filter(Cart.id == int(cart_id)).first()
+        if cart and cart.user_id != user.id:
+            raise HTTPException(
+                detail={'message': "Siz bu obyektning egasi emassiz"},
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+    elif order_id:
+        order = db.query(Order).filter(Order.id == int(order_id)).first()
+        if order and order.user_id != user.id:
             raise HTTPException(
                 detail={'message': "Siz bu obyektning egasi emassiz"},
                 status_code=status.HTTP_403_FORBIDDEN

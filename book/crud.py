@@ -13,7 +13,7 @@ def get_object(session, id, model):
     if not obj:
         raise HTTPException(
             detail={
-                'message': f"{model} not found",
+                'message': f"{model.__name__} not found",
             },
             status_code=status.HTTP_404_NOT_FOUND
         )
@@ -136,9 +136,6 @@ def update_book(session: Session, data: UpdateBookSchema, book_id: int):
     
     return response_model('book updated', status.HTTP_200_OK, book)
 
-
-from fastapi import HTTPException, status
-from sqlalchemy.orm import Session, joinedload
 
 def book_detail(session: Session, book_id: int):
     
@@ -290,4 +287,69 @@ def saved_delete(session: Session, saved_id: int):
     saved = get_object(session, saved_id, Saved)
     session.delete(saved)
     session.commit()
-    return response_model('saved deleted', status.HTTP_204_NO_CONTENT, data=None)
+    return response_model('saved deleted', status.HTTP_204_NO_CONTENT, data=None)
+
+
+#CART AND ORDER
+
+def create_cart(session: Session, data: CreateCartSchema, user_id: int):
+    book = get_object(session, data.book_id, Book)
+    total_price = data.quantity * book.price
+    cart = Cart(user_id=user_id, book_id=data.book_id, quantity=data.quantity, total_price=total_price)
+    session.add(cart)
+    session.commit()
+    session.refresh(cart)
+    
+    return response_model('cart created', status.HTTP_201_CREATED, cart)
+
+def update_cart(session: Session, data: UpdateCartSchema, cart_id: int):
+    cart = get_object(session, cart_id, Cart)
+    
+    data_dump = data.model_dump(exclude_unset=True)
+    
+    for key, value in data_dump.items():
+        setattr(cart, key, value)
+    
+    if 'quantity' in data_dump or 'book_id' in data_dump:
+        book = get_object(session, cart.book_id, Book)
+        cart.total_price = cart.quantity * book.price
+        
+    session.commit()
+    session.refresh(cart)
+    
+    return response_model('cart updated', status.HTTP_200_OK, cart)
+
+def delete_cart(session: Session, cart_id: int):
+    cart = get_object(session, cart_id, Cart)
+    session.delete(cart)
+    session.commit()
+    return response_model('cart deleted', status.HTTP_204_NO_CONTENT, data=None)
+
+def cart_list(session: Session, user, limit: int = 10, offset: int = 0):
+    query = session.query(Cart).options(joinedload(Cart.book))
+    if not user.is_staff:
+        query = query.filter(Cart.user_id == user.id)
+    carts = query.order_by(Cart.id.desc()).offset(offset).limit(limit).all()
+    return response_model('cart list', status.HTTP_200_OK, carts)
+
+def checkout(session: Session, user):
+    carts = session.query(Cart).filter(Cart.user_id == user.id).all()
+    if not carts:
+        raise HTTPException(status_code=400, detail="Savatchangiz bo'sh")
+    
+    orders = []
+    for cart in carts:
+        order = Order(user_id=user.id, book_id=cart.book_id, quantity=cart.quantity, total_price=cart.total_price)
+        session.add(order)
+        orders.append(order)
+        session.delete(cart)
+    
+    session.commit()
+    return response_model('Buyurtma muvaffaqiyatli qabul qilindi', status.HTTP_201_CREATED, None)
+
+def order_list(session: Session, user, limit: int = 10, offset: int = 0):
+    query = session.query(Order).options(joinedload(Order.book))
+    if not user.is_staff:
+        query = query.filter(Order.user_id == user.id)
+    orders = query.order_by(Order.id.desc()).offset(offset).limit(limit).all()
+    return response_model('order list', status.HTTP_200_OK, orders)
