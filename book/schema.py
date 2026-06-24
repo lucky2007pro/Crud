@@ -2,7 +2,6 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from decimal import Decimal
 
-
 class CreateAuthorSchema(BaseModel):
     name : Optional[str] = None
     year: int
@@ -17,14 +16,12 @@ class CreateAuthorSchema(BaseModel):
 class AuthorAut(CreateAuthorSchema):
     pass
     
-    
 class UpdateAuthorSchema(CreateAuthorSchema):
     year: Optional[int] = None
     
     class Config:
         from_attribute=True
 
-    
 class CreateCategorySchema(BaseModel):
     title : str = Field(max_length=100)
     class Config:
@@ -35,7 +32,6 @@ class UpdateCategorySchema(BaseModel):
     
     class Config:
         from_attribute=True
-    
 
 class CreateBookSchema(BaseModel):
     title : str = Field(max_length=100)
@@ -44,21 +40,21 @@ class CreateBookSchema(BaseModel):
     price : Decimal = Field(max_digits=1200, decimal_places=2)
     author_id : int
     category_id : int
+    image_url : Optional[str] = None
     is_published : Optional[bool] = None
     
     class Config:
         from_attribute=True
-    
     
 class UpdateBookSchema(CreateBookSchema):
     title : Optional[str] = None
     price : Optional[float] = Field(default=None, max_digits=12, decimal_places=2, ge=0)
     author_id : Optional[int] = None
     category_id : Optional[int] = None
+    image_url : Optional[str] = None
     
     class Config:
         from_attribute=True
-    
 
 class CreateCommentSchema(BaseModel):
     summary : str = Field(max_length=100)
@@ -67,7 +63,6 @@ class CreateCommentSchema(BaseModel):
     
     class Config:
         from_attribute=True
-    
     
 class UpdateCommentSchema(BaseModel):
     summary : Optional[str]  = Field(default=None, max_length=100)

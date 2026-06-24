@@ -19,8 +19,8 @@ def detail_author_router(author_id:int, session: Session = Depends(get_db)):
     return crud.author_detail(session, author_id)
 
 @router.get('/list-author/')
-def list_author_router(session: Session = Depends(get_db)):
-    return crud.author_list(session)
+def list_author_router(session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.author_list(session, limit, offset)
 
 @router.patch('/update-author/{author_id}', dependencies=[Depends(is_admin)])
 def update_author_router(author_id:int, data: schema.UpdateAuthorSchema ,session: Session = Depends(get_db)):
@@ -41,8 +41,8 @@ def detail_category_router(category_id:int, session: Session = Depends(get_db)):
     return crud.category_detail(session, category_id)
 
 @router.get('/list-category/')
-def list_category_router(session: Session = Depends(get_db)):
-    return crud.category_list(session)
+def list_category_router(session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.category_list(session, limit, offset)
 
 @router.patch('/update-category/{category_id}', dependencies=[Depends(is_admin)])
 def update_category_router(category_id:int, data: schema.UpdateCategorySchema ,session: Session = Depends(get_db)):
@@ -63,16 +63,16 @@ def detail_book_router(book_id:int, session: Session = Depends(get_db)):
     return crud.book_detail(session, book_id)
 
 @router.get('/list-book/')
-def list_book_router(session: Session = Depends(get_db)):
-    return crud.book_list(session)
+def list_book_router(session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.book_list(session, limit, offset)
 
 @router.get('/filter-book/')
-def filter_book_router(title: str = None, desc: str = None, session: Session = Depends(get_db)):
-    return crud.filter_book(session, title, desc)
+def filter_book_router(title: str = None, desc: str = None, session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.filter_book(session, title, desc, limit, offset)
 
 @router.get('/search-book/')
-def search_book_router(query_str: str = None, session: Session = Depends(get_db)):
-    return crud.search_book(session, query_str)
+def search_book_router(query_str: str = None, session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.search_book(session, query_str, limit, offset)
 
 @router.patch('/update-book/{book_id}', dependencies=[Depends(is_admin)])
 def update_book_router(book_id:int, data: schema.UpdateBookSchema ,session: Session = Depends(get_db)):
@@ -93,8 +93,8 @@ def detail_comment_router(comment_id:int, session: Session = Depends(get_db)):
     return crud.comment_detail(session, comment_id)
 
 @router.get('/list-comment/')
-def list_comment_router(session: Session = Depends(get_db)):
-    return crud.comment_list(session)
+def list_comment_router(session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.comment_list(session, limit, offset)
 
 @router.patch('/update-comment/{comment_id}', dependencies=[Depends(is_owner)])
 def update_comment_router(comment_id:int, data: schema.UpdateCommentSchema ,session: Session = Depends(get_db)):
@@ -115,8 +115,8 @@ def detail_saved_router(saved_id:int, session: Session = Depends(get_db)):
     return crud.saved_detail(session, saved_id)
 
 @router.get('/list-saved/')
-def list_saved_router(session: Session = Depends(get_db)):
-    return crud.saved_list(session)
+def list_saved_router(session: Session = Depends(get_db), limit: int = 10, offset: int = 0):
+    return crud.saved_list(session, limit, offset)
 
 @router.patch('/update-saved/{saved_id}', dependencies=[Depends(is_owner)])
 def update_saved_router(saved_id:int, data: schema.UpdateSavedSchema ,session: Session = Depends(get_db)):

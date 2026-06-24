@@ -35,5 +35,5 @@ def refresh_token(Authorize: AuthJWT = Depends()):
     return token_refresh(Authorize)
 
 @router.post("/logout", dependencies=[Depends(check_token)])
-def logout_user(Authorize: AuthJWT = Depends()):
-    return logout(Authorize)
+def logout_user(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
+    return logout(Authorize, db)

@@ -1,5 +1,5 @@
 import re
-from user.models import User, BlacklistToken
+from user.models import User, BlackListToken
 from user.schema import SignUpSchema, LoginSchema, ProfileUpdateSchema, PasswordChangeSchema
 from sqlalchemy.orm import Session
 from db import SessionLocal
@@ -240,14 +240,10 @@ def token_refresh(Authorize: AuthJWT):
             status_code=status.HTTP_401_UNAUTHORIZED
         )
 
-def logout(Authorize: AuthJWT):
+def logout(Authorize: AuthJWT, db: Session):
     try:
         Authorize.jwt_required()
         jti = Authorize.get_raw_jwt()['jti']
-        return {
-            'message': 'User logged out successfully',
-            'status': status.HTTP_200_OK,
-        }
     except Exception as e:
         if isinstance(e, HTTPException):
             raise e
@@ -257,7 +253,7 @@ def logout(Authorize: AuthJWT):
             },
             status_code=status.HTTP_401_UNAUTHORIZED
         )
-    token = BlacklistToken(jti=jti)
+    token = BlackListToken(jti=jti)
     db.add(token)
     db.commit()
     return {

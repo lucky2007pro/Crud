@@ -37,6 +37,7 @@ class Book(Base):
     is_published = Column(Boolean, default=True)
     author_id = Column(Integer, ForeignKey('authors.id', ondelete='CASCADE'))
     category_id = Column(Integer, ForeignKey('categories.id', ondelete='CASCADE'))
+    image_url = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=func.now())
 
     
@@ -50,7 +51,7 @@ class Comment(Base):
     
     id = Column(Integer, primary_key=True)
     summary = Column(String(120))
-    user = Column(String(12))
+    user = Column(String(50))
     book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'))
     created_at = Column(DateTime, default=func.now())
 
@@ -61,7 +62,7 @@ class Saved(Base):
     __tablename__ = 'saveds'
     
     id = Column(Integer, primary_key=True)
-    user = Column(String(12))
+    user = Column(String(50))
     book_id = Column(Integer, ForeignKey('books.id', ondelete='CASCADE'))
     created_at = Column(DateTime, default=func.now())
 

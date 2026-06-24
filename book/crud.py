@@ -62,8 +62,8 @@ def author_detail(session: Session, author_id: int):
     return response_model('Author', status.HTTP_200_OK, {'author': author, 'books': author.books})
 
 
-def author_list(session: Session):
-    authors = session.query(Author).order_by(Author.id.desc()).all()
+def author_list(session: Session, limit: int = 10, offset: int = 0):
+    authors = session.query(Author).order_by(Author.id.desc()).offset(offset).limit(limit).all()
     return response_model('Author', status.HTTP_200_OK, authors)
 
 def author_delete(session: Session, author_id: int):
@@ -108,8 +108,8 @@ def category_delete(session: Session, category_id:int):
     return response_model('category deleted', status.HTTP_204_NO_CONTENT, data=None)
 
 
-def category_list(session: Session):
-    categories = session.query(Category).order_by(Category.id.desc()).all()
+def category_list(session: Session, limit: int = 10, offset: int = 0):
+    categories = session.query(Category).order_by(Category.id.desc()).offset(offset).limit(limit).all()
     return response_model('category', status.HTTP_200_OK, categories)
 
 
@@ -190,20 +190,20 @@ def book_delete(session: Session, book_id:int):
     return response_model('book deleted', status.HTTP_204_NO_CONTENT, data=None)
 
 
-def book_list(session: Session):
-    books = session.query(Book).options(joinedload(Book.author)).order_by(Book.id.desc()).all()
+def book_list(session: Session, limit: int = 10, offset: int = 0):
+    books = session.query(Book).options(joinedload(Book.author)).order_by(Book.id.desc()).offset(offset).limit(limit).all()
     return response_model('book', status.HTTP_200_OK, books)
 
-def filter_book(session: Session, title: str = None, desc: str = None):
+def filter_book(session: Session, title: str = None, desc: str = None, limit: int = 10, offset: int = 0):
     query = session.query(Book).options(joinedload(Book.author), joinedload(Book.category))
     if title:
         query = query.filter(Book.title.ilike(f"%{title}%"))
     if desc:
         query = query.filter(Book.desc.ilike(f"%{desc}%"))
-    books = query.order_by(Book.id.desc()).all()
+    books = query.order_by(Book.id.desc()).offset(offset).limit(limit).all()
     return response_model('Filtered books', status.HTTP_200_OK, books)
 
-def search_book(session: Session, query_str: str = None):
+def search_book(session: Session, query_str: str = None, limit: int = 10, offset: int = 0):
     from sqlalchemy import or_
     query = session.query(Book).options(joinedload(Book.author), joinedload(Book.category))
     if query_str:
@@ -213,7 +213,7 @@ def search_book(session: Session, query_str: str = None):
                 Book.desc.ilike(f"%{query_str}%")
             )
         )
-    books = query.order_by(Book.id.desc()).all()
+    books = query.order_by(Book.id.desc()).offset(offset).limit(limit).all()
     return response_model('Search results', status.HTTP_200_OK, books)
 
 
@@ -245,8 +245,8 @@ def comment_detail(session: Session, comment_id: int):
     comment = get_object(session, comment_id, Comment)
     return response_model('comment detail', status.HTTP_200_OK, comment)
 
-def comment_list(session: Session):
-    comments = session.query(Comment).order_by(Comment.id.desc()).all()
+def comment_list(session: Session, limit: int = 10, offset: int = 0):
+    comments = session.query(Comment).order_by(Comment.id.desc()).offset(offset).limit(limit).all()
     return response_model('comment list', status.HTTP_200_OK, comments)
 
 def comment_delete(session: Session, comment_id: int):
@@ -282,8 +282,8 @@ def saved_detail(session: Session, saved_id: int):
     saved = get_object(session, saved_id, Saved)
     return response_model('saved detail', status.HTTP_200_OK, saved)
 
-def saved_list(session: Session):
-    saveds = session.query(Saved).order_by(Saved.id.desc()).all()
+def saved_list(session: Session, limit: int = 10, offset: int = 0):
+    saveds = session.query(Saved).order_by(Saved.id.desc()).offset(offset).limit(limit).all()
     return response_model('saved list', status.HTTP_200_OK, saveds)
 
 def saved_delete(session: Session, saved_id: int):
